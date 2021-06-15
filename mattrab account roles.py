@@ -47,27 +47,28 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
 
 # Initial call to print 0% progress
 l = len(account_link)
+l == 0 and exit()
 printProgressBar(0, l, prefix = 'Finding:', suffix = 'Complete', length = 50)
-max_len = 0
+max_len = 4
 for i, link in enumerate(account_link):
-    html_text = requests.get(link).text
-    soup = BeautifulSoup(html_text, 'lxml')
-    nameElement = soup.find(class_="name")
-    if nameElement:
-        name = nameElement.text.strip()
-        max_len = len(name) if max_len < len(name) else max_len
-        post = soup.find(class_="badge").text.strip().capitalize()
-        name_and_post.append({
-            'id': link[link.find("users") + 6:link.find("-") if link.find("-") != -1 else len(link)],
-            'name': name,
-            'post': post
-        })
+    id = link[link.find("users") + 6:link.find("-") if link.find("-") != -1 else len(link)]
+    if not any(d['id'] == id for d in name_and_post):
+        html_text = requests.get(link).text
+        soup = BeautifulSoup(html_text, 'lxml')
+        nameElement = soup.find(class_="name")
+        if nameElement:
+            name = nameElement.text.strip()
+            max_len = len(name) if max_len < len(name) else max_len
+            post = soup.find(class_="badge").text.strip().capitalize()
+            name_and_post.append({
+                'id': id,
+                'name': name,
+                'post': post
+            })
     printProgressBar(i + 1, l, prefix = 'Finding:', suffix = 'Complete', length = 50)
 
-if max_len < 4:
-    max_len = 4
 print(f"\n\nID    | Name {' '*(max_len - 4)} | Post")
-print('-'*6 + '|' + '-'*(max_len + 3) + '|' + '-'*11)
+print('-'*6 + '|' + '-'*(max_len + 3) + '|' + '-'*12)
 for person in name_and_post:
     print(person['id'] + ' '*(5 - len(person['id'])) + ' | ' + person['name'] + ' '*(max_len - len(person['name']) + 1) + ' | ' + person['post'])
 print('\n\n')
